@@ -11,13 +11,13 @@ fn main() {
     println!("HOUR ANGLE = {hour_angle}");
 }
 
-fn arccos_bandpass(mut num: f64) -> f64 {
+fn arcsin_bandpass(mut num: f64) -> f64 {
     if num < -1.0 {
         num = 180.0;
     } else if num > 1.0 {
         num = 0.0;
     } else {
-        num = num.acos();
+        num = num.asin();
     }
     return num;
 }
@@ -30,5 +30,5 @@ fn declination(obliquity: f64, orbital_period: f64, time: f64) -> f64 {
 }
 
 fn hour_angle(latitude: f64, declination: f64) -> f64 {
-    return arccos_bandpass(-latitude.tan() * declination.tan()) - 90.0;
+    return arcsin_bandpass(-latitude.tan() * declination.tan()) - 90.0;
 }
