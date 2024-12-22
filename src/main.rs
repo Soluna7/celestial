@@ -30,5 +30,5 @@ fn declination(obliquity: f64, orbital_period: f64, time: f64) -> f64 {
 }
 
 fn hour_angle(latitude: f64, declination: f64) -> f64 {
-    return arcsin_bandpass(-latitude.tan() * declination.tan()) - 90.0;
+    return arcsin_bandpass(-latitude.tan() * declination.tan());
 }
