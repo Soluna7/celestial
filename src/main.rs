@@ -4,7 +4,11 @@ const ORBITAL_PERIOD: f64 = 365.25; //measured in rotations per complete revolut
 const OBLIQUITY: f64 = 23.439281; //tilt of the planet, between -90 and 90 degrees
 
 fn main() {
-    println!("Hello, world!");
+    let time: f64 = 52.0;
+    let latitude: f64 = 37.2; //between -90 and 90
+    let declination = declination(OBLIQUITY, ORBITAL_PERIOD, time);
+    let hour_angle = hour_angle(latitude, declination);
+    println!("HOUR ANGLE = {hour_angle}");
 }
 
 fn arccos_bandpass(mut num: f64) -> f64 {
@@ -23,4 +27,8 @@ fn declination(obliquity: f64, orbital_period: f64, time: f64) -> f64 {
     let ecliptic_longitude = (360.0 * time) / orbital_period;
     let declination: f64 = obliquity * ecliptic_longitude.sin();
     return declination;
+}
+
+fn hour_angle(latitude: f64, declination: f64) -> f64 {
+    return arccos_bandpass(-latitude.tan() * declination.tan()) - 90.0;
 }
