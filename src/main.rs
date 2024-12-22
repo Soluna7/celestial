@@ -4,10 +4,11 @@ const ORBITAL_PERIOD: f64 = 365.25; //measured in rotations per complete revolut
 const OBLIQUITY: f64 = 23.439281; //tilt of the planet, between -90 and 90 degrees
 
 fn main() {
-    let time: f64 = 52.0;
-    let latitude: f64 = 37.2; //between -90 and 90
+    let time: f64 = 357.0;
+    let latitude: f64 = 32.896; //between -90 and 90
     let declination = declination(OBLIQUITY, ORBITAL_PERIOD, time);
     let hour_angle = hour_angle(latitude, declination);
+    println!("DECLINATION = {declination}");
     println!("HOUR ANGLE = {hour_angle}");
 }
 
@@ -17,7 +18,7 @@ fn arcsin_bandpass(mut num: f64) -> f64 {
     } else if num > 1.0 {
         num = 0.0;
     } else {
-        num = num.asin();
+        num = num.asin().to_degrees();
     }
     return num;
 }
@@ -25,10 +26,17 @@ fn arcsin_bandpass(mut num: f64) -> f64 {
 fn declination(obliquity: f64, orbital_period: f64, time: f64) -> f64 {
     //time measured in number of full rotations (days)
     let ecliptic_longitude = (360.0 * time) / orbital_period;
-    let declination: f64 = obliquity * ecliptic_longitude.sin();
+    let declination: f64 = -obliquity * ecliptic_longitude.to_radians().sin();
+    println!("ECLIPTIC LONGITUDE = {ecliptic_longitude}");
+    let x = ecliptic_longitude.to_radians().sin();
+    println!("ECLIPTIC LONGITUDE SINE = {x}");
     return declination;
 }
 
 fn hour_angle(latitude: f64, declination: f64) -> f64 {
-    return arcsin_bandpass(-latitude.tan() * declination.tan());
+    let ltan = -latitude.to_radians().tan();
+    let dtan = declination.to_radians().tan();
+    println!("LATITUDE TAN: {ltan}");
+    println!("DECLINATION TAN: {dtan}");
+    return arcsin_bandpass(ltan * dtan);
 }
