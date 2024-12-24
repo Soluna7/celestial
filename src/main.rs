@@ -7,6 +7,7 @@ fn main() {
     let time: f64 = 357.0; //day in year (mod ORBITAL_PERIOD)
     let latitude: f64 = 33.3532905478; //between -90 and 90
     let _longitude: f64 = -97.8763568637; //between -180 and 180
+    let _altitude: f64 = 302.0; //altitude from radius (sea level) in meters
     let declination = declination(OBLIQUITY, ORBITAL_PERIOD, time);
     let hour_angle = hour_angle(latitude, declination);
     println!("DECLINATION = {declination}");
