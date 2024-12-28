@@ -28,7 +28,7 @@ fn arcsin_bandpass(mut num: f64) -> f64 {
 fn declination(obliquity: f64, orbital_period: f64, time: f64) -> f64 {
     //time measured in number of full rotations (days)
     let ecliptic_longitude = (360.0 * time) / orbital_period;
-    let declination: f64 = -obliquity * ecliptic_longitude.to_radians().sin();
+    let declination: f64 = obliquity * ecliptic_longitude.to_radians().sin();
     println!("ECLIPTIC LONGITUDE = {ecliptic_longitude}");
     let x = ecliptic_longitude.to_radians().sin();
     println!("ECLIPTIC LONGITUDE SINE = {x}");
@@ -36,9 +36,9 @@ fn declination(obliquity: f64, orbital_period: f64, time: f64) -> f64 {
 }
 
 fn hour_angle(latitude: f64, declination: f64) -> f64 {
-    let ltan = -latitude.to_radians().tan();
+    let ltan = latitude.to_radians().tan();
     let dtan = declination.to_radians().tan();
     println!("LATITUDE TANGENT: {ltan}");
     println!("DECLINATION TANGENT: {dtan}");
-    return arcsin_bandpass(ltan * dtan);
+    return -arcsin_bandpass(ltan * dtan);
 }
