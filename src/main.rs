@@ -60,13 +60,24 @@ fn elevation_angle(obliquity:f64, orbital_period:f64, latitude:f64, longitude:f6
     return elevation_angle;
 }
 
+fn max_azimuth_angle(latitude:f64, declination:f64) -> f64 {
+    let max_azimuth_angle = (
+        latitude.to_radians().cos()*declination.to_radians().sin() - 
+        latitude.to_radians().sin()*declination.to_radians().cos() *
+        hour_angle(latitude, declination)
+    )/max_elevation_angle(latitude, declination);
+    let max_azimuth_angle = max_azimuth_angle.acos().to_degrees();
+    return max_azimuth_angle;
+}
+
 fn azimuth_angle(obliquity:f64, orbital_period:f64, latitude:f64, longitude:f64, time:f64) -> f64 {
     let declination = declination(obliquity, orbital_period, time + longitude/orbital_period);
-    let hour_angle = hour_angle(latitude, declination);
-    let azimuth_angle =
-        (declination.to_radians().sin()*latitude.to_radians().cos() + 
-        declination.to_radians().cos()*latitude.to_radians().sin()*
-        latitude.to_radians().cos()
-        )/declination.to_radians().cos();
-    return azimuth_angle.to_degrees();
+    let maximum_azimuth_angle = max_azimuth_angle(latitude, declination);
+    let minimum_azimuth_angle = max_azimuth_angle(-latitude, declination);
+    let oscillator = (TAU * (time+(longitude/orbital_period))) % TAU;
+    let azimuth_angle = 
+        (maximum_azimuth_angle - minimum_azimuth_angle)/2.0 +
+        (maximum_azimuth_angle + minimum_azimuth_angle)/2.0 * oscillator.sin();
+    return azimuth_angle;
+    //hour angle?
 }
