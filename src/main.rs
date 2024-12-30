@@ -54,9 +54,19 @@ fn elevation_angle(obliquity:f64, orbital_period:f64, latitude:f64, longitude:f6
     let maximum_elevation_angle = max_elevation_angle(latitude, declination);
     let minimum_elevation_angle = max_elevation_angle(-latitude, declination);
     let oscillator = (TAU * (time+(longitude/orbital_period))) % TAU;
-    println!("{oscillator}");
     let elevation_angle = 
         (maximum_elevation_angle - minimum_elevation_angle)/2.0 +
         (maximum_elevation_angle + minimum_elevation_angle)/2.0 * oscillator.sin();
     return elevation_angle;
+}
+
+fn azimuth_angle(obliquity:f64, orbital_period:f64, latitude:f64, longitude:f64, time:f64) -> f64 {
+    let declination = declination(obliquity, orbital_period, time + longitude/orbital_period);
+    let hour_angle = hour_angle(latitude, declination);
+    let azimuth_angle =
+        (declination.to_radians().sin()*latitude.to_radians().cos() + 
+        declination.to_radians().cos()*latitude.to_radians().sin()*
+        latitude.to_radians().cos()
+        )/declination.to_radians().cos();
+    return azimuth_angle.to_degrees();
 }
