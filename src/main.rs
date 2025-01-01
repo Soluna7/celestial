@@ -1,4 +1,3 @@
-use std::*;
 use num_traits::sign::signum;
 
 const ORBITAL_PERIOD: f64 = 365.256363004; //length of sidereal year in ephemeris days, measured in rotations per complete revolution (basically days in year)
