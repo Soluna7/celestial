@@ -1,6 +1,5 @@
-mod solar;
-
-use crate::solar::Polar;
+use solar_time::solar;
+use solar_time::solar::Polar;
 
 const ORBITAL_PERIOD: f64 = 365.256363004; //length of sidereal year in ephemeris days, measured in rotations per complete revolution (basically days in year)
 const OBLIQUITY: f64 = 23.439281; //tilt of the planet, between -90 and 90 degrees
