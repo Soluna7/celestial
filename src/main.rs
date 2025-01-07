@@ -19,6 +19,6 @@ fn main() {
         print!("AZIMUTH : {:>6.1$} | ", solar_azimuth, PRECISION);
         print!("ELEVATION : {:>6.1$} | ", solar_elevation, PRECISION);
         println!("");
-        time += 1.0 / 24.0;
+        time += 1.0 / (24.0 * 60.0);
     }
 }
