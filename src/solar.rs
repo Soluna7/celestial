@@ -38,6 +38,9 @@ fn azimuth_angle(latitude: f64, declination: f64, time: f64) -> f64 {
     let azimuth_angle = (latitude.to_radians().sin() * elevation_angle.to_radians().sin()
         - declination.to_radians().sin())
         / (latitude.to_radians().cos() * elevation_angle.to_radians().cos());
+    if azimuth_angle.abs() > 1.0 {
+        return 180.0 * (azimuth_angle.signum() + 1.0) / 2.0;
+    }
     let azimuth_angle = azimuth_angle.acos().to_degrees();
     if hour_angle(time) > 0.0 {
         let azimuth_angle = azimuth_angle + 180.0;
