@@ -14,11 +14,45 @@ fn main() {
         let sun_position = solar::sun_position(OBLIQUITY, ORBITAL_PERIOD, player_position, time);
         let solar_azimuth = sun_position.azimuth;
         let solar_elevation = sun_position.elevation;
-        const PRECISION: usize = 2;
-        print!("TIME : {:>6.1$} | ", time, PRECISION);
-        print!("AZIMUTH : {:>6.1$} | ", solar_azimuth, PRECISION);
-        print!("ELEVATION : {:>6.1$} | ", solar_elevation, PRECISION);
-        println!("");
-        time += 1.0 / (24.0 * 60.0);
+        graph(time, solar_azimuth, solar_elevation);
+        time += 1.0/24.0;
     }
+}
+
+fn graph(time: f64, azimuth: f64, elevation: f64) {
+    const PRECISION: usize = 2;
+        print!("TIME : {:>6.1$} | ", time, PRECISION);
+        print!("AZIMUTH : {:>6.1$} | ", azimuth, PRECISION);
+        print!("ELEVATION : {:>6.1$} | ", elevation, PRECISION);
+        let elevation_display_offset = (elevation + 90.0)/2.0;
+        let azimuth_display_offset = azimuth/4.0;
+        for i in 0..elevation_display_offset.abs().floor() as i32 {
+            if i == azimuth_display_offset.floor() as i32{
+                print!("@");
+            }
+            else if i == 45 {
+                print!("|");
+            }
+            else {
+                print!(" ");
+            }
+        }
+        if elevation > 0.0{
+            print!("*");
+        } else {
+            print!(".");
+        }
+        for i in elevation_display_offset.abs().floor() as i32..90 {
+            if i == azimuth_display_offset.floor() as i32 - 1{
+                print!("@");
+            }
+            else if i == 44 {
+                print!("|");
+            }
+            else {
+                print!(" ");
+            }
+        }
+        print!("|");
+        println!("");
 }
