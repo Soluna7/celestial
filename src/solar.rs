@@ -1,13 +1,4 @@
-pub struct Polar {
-    pub longitude: f64,
-    pub altitude: f64,
-    pub latitude: f64,
-}
-
-pub struct Celestial {
-    pub azimuth: f64,
-    pub elevation: f64,
-}
+use crate::components;
 
 fn hour_angle(time: f64) -> f64 {
     let hour_angle = 360.0 * (time % 1.0);
@@ -51,14 +42,20 @@ fn azimuth_angle(latitude: f64, declination: f64, time: f64) -> f64 {
     }
 }
 
-pub fn sun_position(obliquity: f64, orbital_period: f64, position: Polar, time: f64) -> Celestial {
+pub fn sun_position(
+    planet: components::Planet,
+    position: components::Polar,
+    time: f64,
+) -> components::Celestial {
     let longitude = position.longitude;
     let latitude = position.latitude;
+    let obliquity = planet.obliquity;
+    let orbital_period = planet.orbital_period;
     let time = time + longitude / 180.0;
     let declination = declination(obliquity, orbital_period, time);
     let elevation_angle = elevation_angle(latitude, declination, time);
     let azimuth_angle = azimuth_angle(latitude, declination, time);
-    let sun_position = Celestial {
+    let sun_position = components::Celestial {
         azimuth: azimuth_angle,
         elevation: elevation_angle,
     };
