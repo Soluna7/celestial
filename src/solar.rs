@@ -7,6 +7,7 @@ pub trait Solar {
     fn declination(&self, time: f64) -> f64;
     fn ecliptic_longitude(&self, time: f64) -> f64;
     fn mean_anomaly(&self, time: f64) -> f64;
+    fn true_anomaly(&self, time: f64) -> f64;
     fn annual_periapsis(&self) -> f64;
     fn periaptic_longitude(&self, time: f64) -> f64;
     fn equation_of_time(&self, time: f64) -> f64;
@@ -14,13 +15,21 @@ pub trait Solar {
 
 impl Solar for World {
     fn declination(&self, time: f64) -> f64 {
-        self.obliquity * self.ecliptic_longitude(time).sin()
+        self.obliquity.sin() * self.true_anomaly(time).sin()
     }
     fn ecliptic_longitude(&self, time: f64) -> f64 {
         (TAU * time) / self.orbital_period
     }
     fn mean_anomaly(&self, time: f64) -> f64 {
         TAU * (time - self.annual_periapsis()) / self.orbital_period
+    }
+    fn true_anomaly(&self, time: f64) -> f64 {
+        let eccentricity = self.eccentricity;
+        let mean_anomaly = self.mean_anomaly(time);
+        let ecliptic_longitude = self.ecliptic_longitude(time);
+        return ecliptic_longitude
+            + 2.0 * eccentricity * mean_anomaly.sin()
+            + 1.25 * eccentricity.powi(2) * (2.0 * mean_anomaly).sin();
     }
     fn annual_periapsis(&self) -> f64 {
         self.orbital_period * self.periaptic_period
