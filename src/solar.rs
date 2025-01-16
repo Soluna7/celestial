@@ -1,63 +1,71 @@
-use crate::components;
+use crate::coordinates;
+use crate::world;
+use crate::world::*;
+use std::f64::consts::TAU;
 
-fn hour_angle(time: f64) -> f64 {
-    let hour_angle = 360.0 * (time % 1.0);
-    return hour_angle - hour_angle.signum() * 180.0;
+pub trait Solar {
+    fn declination(self, time: f64) -> f64;
 }
 
-fn declination(obliquity: f64, orbital_period: f64, time: f64) -> f64 {
-    //time measured in number of full rotations (days)
-    let ecliptic_longitude = (360.0 * time) / orbital_period;
-    let declination: f64 = obliquity * ecliptic_longitude.to_radians().sin();
-    return declination;
+impl Solar for World {
+    fn declination(self, time: f64) -> f64 {
+        let ecliptic_longitude = (TAU * time) / self.orbital_period;
+        let declination: f64 = self.obliquity * ecliptic_longitude.sin();
+        return declination;
+    }
+}
+
+fn hour_angle(time: f64) -> f64 {
+    let hour_angle = TAU * (time % 1.0);
+    return hour_angle - hour_angle.signum() * TAU / 2.0;
 }
 
 fn elevation_angle(latitude: f64, declination: f64, time: f64) -> f64 {
     let hour_angle = hour_angle(time);
-    let elevation_angle = latitude.to_radians().sin() * declination.to_radians().sin()
-        + latitude.to_radians().cos()
-            * declination.to_radians().cos()
-            * hour_angle.to_radians().cos();
-    return elevation_angle.asin().to_degrees();
+    let elevation_angle =
+        latitude.sin() * declination.sin() + latitude.cos() * declination.cos() * hour_angle.cos();
+    return elevation_angle.asin();
 }
 
 fn azimuth_angle(latitude: f64, declination: f64, time: f64) -> f64 {
-    if latitude.abs() >= 90.0 {
-        return 360.0 * (-latitude.signum() * time + (latitude.signum() + 1.0) / 4.0) % 1.0;
+    if latitude.abs() >= TAU / 4.0 {
+        return TAU * (-latitude.signum() * time + (latitude.signum() + 1.0) / 4.0) % 1.0;
     }
     let elevation_angle = elevation_angle(latitude, declination, time);
-    let azimuth_angle = (latitude.to_radians().sin() * elevation_angle.to_radians().sin()
-        - declination.to_radians().sin())
-        / (latitude.to_radians().cos() * elevation_angle.to_radians().cos());
+    let azimuth_angle = (latitude.sin() * elevation_angle.sin() - declination.sin())
+        / (latitude.cos() * elevation_angle.cos());
     if azimuth_angle.abs() > 1.0 {
-        return 180.0 * (azimuth_angle.signum() + 1.0) / 2.0;
+        return TAU / 2.0 * (azimuth_angle.signum() + 1.0) / 2.0;
     }
-    let azimuth_angle = azimuth_angle.acos().to_degrees();
+    let azimuth_angle = azimuth_angle.acos();
     if hour_angle(time) > 0.0 {
-        let azimuth_angle = azimuth_angle + 180.0;
-        return azimuth_angle % 360.0;
+        let azimuth_angle = azimuth_angle + TAU / 2.0;
+        return azimuth_angle % TAU;
     } else {
-        let azimuth_angle = 540.0 - azimuth_angle;
-        return azimuth_angle % 360.0;
+        let azimuth_angle = 1.5 * TAU - azimuth_angle;
+        return azimuth_angle % TAU;
     }
 }
 
+fn equation_of_time(time: f64) -> f64 {
+    let hour_angle = hour_angle(time);
+    return hour_angle;
+}
+
 pub fn sun_position(
-    planet: components::Planet,
-    position: components::Polar,
+    world: world::World,
+    position: coordinates::Polar,
     time: f64,
-) -> components::Celestial {
-    let longitude = position.longitude;
-    let latitude = position.latitude;
-    let obliquity = planet.obliquity;
-    let orbital_period = planet.orbital_period;
-    let time = time + longitude / 180.0;
-    let declination = declination(obliquity, orbital_period, time);
+) -> coordinates::Celestial {
+    let longitude = position.longitude.to_radians();
+    let latitude = position.latitude.to_radians();
+    let time = time + longitude / TAU / 2.0;
+    let declination = world.declination(time);
     let elevation_angle = elevation_angle(latitude, declination, time);
     let azimuth_angle = azimuth_angle(latitude, declination, time);
-    let sun_position = components::Celestial {
-        azimuth: azimuth_angle,
-        elevation: elevation_angle,
+    let sun_position = coordinates::Celestial {
+        azimuth: azimuth_angle.to_degrees(),
+        elevation: elevation_angle.to_degrees(),
     };
     return sun_position;
 }

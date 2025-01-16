@@ -1,2 +1,3 @@
-pub mod components;
+pub mod coordinates;
 pub mod solar;
+pub mod world;

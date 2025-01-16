@@ -1,15 +1,16 @@
-use celestial::components;
+use celestial::coordinates;
 use celestial::solar;
+use celestial::world;
 
 const ORBITAL_PERIOD: f64 = 365.256363004; //length of sidereal year in ephemeris days, measured in rotations per complete revolution (basically days in year)
-const OBLIQUITY: f64 = 23.439281; //tilt of the planet, between -90 and 90 degrees
+const OBLIQUITY: f64 = 23.439281; //tilt of the World, between -90 and 90 degrees
 
 fn main() {
     let mut time: f64 = 0.0;
     while time < ORBITAL_PERIOD {
-        let planet = components::Planet::new(OBLIQUITY, ORBITAL_PERIOD);
-        let player_position = components::Polar::new(0.0, 0.0, 30.0);
-        let sun_position = solar::sun_position(planet, player_position, time);
+        let world = world::World::new(OBLIQUITY, ORBITAL_PERIOD);
+        let player_position = coordinates::Polar::new(0.0, 0.0, 30.0);
+        let sun_position = solar::sun_position(world, player_position, time);
         let solar_azimuth = sun_position.azimuth;
         let solar_elevation = sun_position.elevation;
         graph(time, solar_azimuth, solar_elevation);
