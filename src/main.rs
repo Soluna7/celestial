@@ -3,12 +3,14 @@ use celestial::solar;
 use celestial::world;
 
 const ORBITAL_PERIOD: f64 = 365.256363004; //length of sidereal year in ephemeris days, measured in rotations per complete revolution (basically days in year)
-const OBLIQUITY: f64 = 23.439281; //tilt of the World, between -90 and 90 degrees
+const OBLIQUITY: f64 = 23.439281; //tilt of the world, between -90 and 90 degrees
+const ECCENTRICITY: f64 = 0.01671; //eccentricity of the world, between 0 and 1
+const PERIAPTIC_PERIOD: f64 = 0.1;
 
 fn main() {
     let mut time: f64 = 0.0;
     while time < ORBITAL_PERIOD {
-        let world = world::World::new(OBLIQUITY, ORBITAL_PERIOD);
+        let world = world::World::new(ORBITAL_PERIOD, OBLIQUITY, ECCENTRICITY, PERIAPTIC_PERIOD);
         let player_position = coordinates::Polar::new(0.0, 0.0, 30.0);
         let sun_position = solar::sun_position(world, player_position, time);
         let solar_azimuth = sun_position.azimuth;

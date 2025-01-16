@@ -4,14 +4,47 @@ use crate::world::*;
 use std::f64::consts::TAU;
 
 pub trait Solar {
-    fn declination(self, time: f64) -> f64;
+    fn declination(&self, time: f64) -> f64;
+    fn ecliptic_longitude(&self, time: f64) -> f64;
+    fn mean_anomaly(&self, time: f64) -> f64;
+    fn annual_periapsis(&self) -> f64;
+    fn periaptic_longitude(&self, time: f64) -> f64;
+    fn equation_of_time(&self, time: f64) -> f64;
 }
 
 impl Solar for World {
-    fn declination(self, time: f64) -> f64 {
-        let ecliptic_longitude = (TAU * time) / self.orbital_period;
-        let declination: f64 = self.obliquity * ecliptic_longitude.sin();
-        return declination;
+    fn declination(&self, time: f64) -> f64 {
+        self.obliquity * self.ecliptic_longitude(time).sin()
+    }
+    fn ecliptic_longitude(&self, time: f64) -> f64 {
+        (TAU * time) / self.orbital_period
+    }
+    fn mean_anomaly(&self, time: f64) -> f64 {
+        TAU * (time - self.annual_periapsis()) / self.orbital_period
+    }
+    fn annual_periapsis(&self) -> f64 {
+        self.orbital_period * self.periaptic_period
+    }
+    fn periaptic_longitude(&self, time: f64) -> f64 {
+        self.ecliptic_longitude(time) * self.mean_anomaly(time)
+    }
+    fn equation_of_time(&self, time: f64) -> f64 {
+        let obliquity = self.obliquity;
+        let eccentricity = self.eccentricity;
+        let mean_anomaly = self.mean_anomaly(time);
+        let periaptic_longitude = self.periaptic_longitude(time);
+        let first_pass = -2.0 * eccentricity * mean_anomaly.sin()
+            + (obliquity / 2.0).tan().powi(2) * (2.0 * (mean_anomaly + periaptic_longitude)).sin();
+        let second_pass = -1.25 * eccentricity.powi(2) * (2.0 * mean_anomaly).sin()
+            + 4.0
+                * eccentricity
+                * (obliquity / 2.0).tan().powi(2)
+                * mean_anomaly.sin()
+                * (2.0 * (mean_anomaly + periaptic_longitude)).cos()
+            - 0.5
+                * (obliquity / 2.0).tan().powi(4)
+                * (2.0 * (2.0 * mean_anomaly + periaptic_longitude));
+        return first_pass + second_pass;
     }
 }
 
@@ -45,11 +78,6 @@ fn azimuth_angle(latitude: f64, declination: f64, time: f64) -> f64 {
         let azimuth_angle = 1.5 * TAU - azimuth_angle;
         return azimuth_angle % TAU;
     }
-}
-
-fn equation_of_time(time: f64) -> f64 {
-    let hour_angle = hour_angle(time);
-    return hour_angle;
 }
 
 pub fn sun_position(
