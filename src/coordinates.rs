@@ -23,22 +23,42 @@ pub struct Celestial {
     pub elevation: f64,
 }
 
-pub trait ToPolar {
-    fn polar(self) -> Polar;
+pub trait CartesianMethods {
+    fn update(&self, radius: f64) -> Self;
+    fn polar(&self) -> Polar;
 }
 
-impl ToPolar for DVec3 {
-    fn polar(self) -> Polar {
+fn mode(n: f64) -> f64 {
+    (n - 1.0) % 2.0 - 1.0
+}
+
+fn tri(n: f64, r: f64) -> f64 {
+    4.0 * (((n - r) / 4.0) % r - r / 2.0).abs() - r.abs()
+}
+
+fn flip(x: f64, y: f64, r: f64) -> f64 {
+    2.0 * mode(((x + r) / r).floor() + ((y + r) / r).floor()) + 1.0
+}
+
+impl CartesianMethods for DVec3 {
+    fn update(&self, radius: f64) -> Self {
+        let f = flip(self.x, self.y, radius);
+        let x = f * tri(self.x, radius);
+        let y = f * self.y;
+        let z = f * tri(self.z, radius);
+        return DVec3::new(x, y, z);
+    }
+    fn polar(&self) -> Polar {
         return Polar::new(-self.x, -self.y, -self.z);
     }
 }
 
-pub trait ToCartesian {
-    fn cartesian(self) -> DVec3;
+pub trait PolarMethods {
+    fn cartesian(&self) -> DVec3;
 }
 
-impl ToCartesian for Polar {
-    fn cartesian(self) -> DVec3 {
+impl PolarMethods for Polar {
+    fn cartesian(&self) -> DVec3 {
         let longitude = self.longitude.to_radians();
         let latitude = self.latitude.to_radians();
         let chi: f64 = (2.0 * (longitude + TAU / 2.0)).cos();

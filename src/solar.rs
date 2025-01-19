@@ -27,9 +27,10 @@ impl Solar for World {
         let eccentricity = self.eccentricity;
         let mean_anomaly = self.mean_anomaly(time);
         let ecliptic_longitude = self.ecliptic_longitude(time);
-        return ecliptic_longitude
+        return (ecliptic_longitude
             + 2.0 * eccentricity * mean_anomaly.sin()
-            + 1.25 * eccentricity.powi(2) * (2.0 * mean_anomaly).sin();
+            + 1.25 * eccentricity.powi(2) * (2.0 * mean_anomaly).sin())
+            / 24.0;
     }
     fn annual_periapsis(&self) -> f64 {
         self.orbital_period * self.periaptic_period
