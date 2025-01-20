@@ -18,7 +18,7 @@ impl Polar {
     }
 }
 
-pub struct Celestial {
+pub struct Horizontal {
     pub azimuth: f64,
     pub elevation: f64,
 }

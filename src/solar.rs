@@ -94,14 +94,14 @@ pub fn sun_position(
     world: world::World,
     position: coordinates::Polar,
     time: f64,
-) -> coordinates::Celestial {
+) -> coordinates::Horizontal {
     let longitude = position.longitude.to_radians();
     let latitude = position.latitude.to_radians();
     let time = time + longitude / TAU / 2.0;
     let declination = world.declination(time);
     let elevation_angle = elevation_angle(latitude, declination, time);
     let azimuth_angle = azimuth_angle(latitude, declination, time);
-    let sun_position = coordinates::Celestial {
+    let sun_position = coordinates::Horizontal {
         azimuth: azimuth_angle.to_degrees(),
         elevation: elevation_angle.to_degrees(),
     };
