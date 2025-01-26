@@ -18,7 +18,7 @@ fn main() {
             ECCENTRICITY,
             PERIAPTIC_PERIOD,
         );
-        let player_position = coordinates::Polar::new(0.0, 0.0, 30.0);
+        let player_position = coordinates::Polar::new(0.0, 0.0, 0.0);
         let sun_position = solar::sun_position(world, player_position, time);
         let solar_azimuth = sun_position.azimuth;
         let solar_elevation = sun_position.elevation;
